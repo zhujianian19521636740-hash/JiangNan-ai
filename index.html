@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f8ff">
+  <meta name="description" content="江南 AI，一个简洁、清新的智能聊天网页。">
+  <title>江南 AI - 智能聊天助手</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">江</div>
+        <div class="brand-copy">
+          <h1>江南 AI</h1>
+          <p>让灵感自由流淌</p>
+        </div>
+        <button class="icon-button sidebar-close" id="closeSidebar"
+          type="button" aria-label="关闭侧边栏" title="关闭侧边栏">
+          ×
+        </button>
+      </div>
+
+      <button class="new-chat-button" id="newChatButton" type="button">
+        <span class="plus-icon" aria-hidden="true">＋</span>
+        <span>开启新对话</span>
+      </button>
+
+      <div class="history-heading">
+        <span>最近对话</span>
+        <span class="history-count" id="historyCount">0</span>
+      </div>
+
+      <div class="history-list" id="historyList" aria-label="聊天历史">
+        <!-- 聊天记录由 JavaScript 自动生成 -->
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="local-notice">
+          <span class="status-dot" aria-hidden="true"></span>
+          <div>
+            <strong>本地模式</strong>
+            <p>对话保存在当前浏览器</p>
+          </div>
+        </div>
+        <div class="sidebar-footer">
+          <span>江南 AI</span>
+          <span>·</span>
+          <span>第一阶段体验版</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" id="menuButton"
+            type="button" aria-label="打开聊天历史" title="聊天历史">
+            <span class="menu-lines" aria-hidden="true">☰</span>
+          </button>
+          <div class="mobile-brand">
+            <span class="mobile-brand-mark">江</span>
+            <span>江南 AI</span>
+          </div>
+          <div class="model-label">
+            <span class="model-dot" aria-hidden="true"></span>
+            智能聊天助手
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <span class="demo-badge">模拟体验</span>
+        </div>
+      </header>
+
+      <section class="chat-area" id="chatArea" aria-label="聊天内容">
+        <div class="welcome" id="welcomeScreen">
+          <div class="welcome-orb" aria-hidden="true">
+            <span class="orb-letter">江</span>
+            <span class="orb-sparkle sparkle-one">✦</span>
+            <span class="orb-sparkle sparkle-two">✧</span>
+          </div>
+
+          <p class="welcome-eyebrow">WELCOME TO JIANGNAN AI</p>
+          <h2>你好，欢迎来到<span>江南 AI</span></h2>
+          <p class="welcome-description">
+            在这里探索灵感、整理思路、学习新知。<br>
+            你想从什么开始？
+          </p>
+
+          <div class="suggestion-grid" id="suggestionGrid">
+            <button class="suggestion-card" type="button"
+              data-prompt="帮我制定一份高效的每日学习计划">
+              <span class="suggestion-icon icon-blue" aria-hidden="true">✎</span>
+              <span class="suggestion-text">
+                <strong>学习与成长</strong>
+                <span>制定每日学习计划</span>
+              </span>
+              <span class="suggestion-arrow" aria-hidden="true">↗</span>
+            </button>
+
+            <button class="suggestion-card" type="button"
+              data-prompt="帮我构思一个有创意的品牌名称和品牌故事">
+              <span class="suggestion-icon icon-purple" aria-hidden="true">✧</span>
+              <span class="suggestion-text">
+                <strong>创意与灵感</strong>
+                <span>构思品牌名称与故事</span>
+              </span>
+              <span class="suggestion-arrow" aria-hidden="true">↗</span>
+            </button>
+
+            <button class="suggestion-card" type="button"
+              data-prompt="请用简单易懂的方式解释人工智能是什么">
+              <span class="suggestion-icon icon-cyan" aria-hidden="true">⌘</span>
+              <span class="suggestion-text">
+                <strong>探索新知</strong>
+                <span>轻松理解人工智能</span>
+              </span>
+              <span class="suggestion-arrow" aria-hidden="true">↗</span>
+            </button>
+
+            <button class="suggestion-card" type="button"
+              data-prompt="帮我写一份清晰、有条理的项目计划书大纲">
+              <span class="suggestion-icon icon-orange" aria-hidden="true">▤</span>
+              <span class="suggestion-text">
+                <strong>工作与效率</strong>
+                <span>生成项目计划书大纲</span>
+              </span>
+              <span class="suggestion-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="message-list" id="messageList"
+          aria-live="polite" aria-label="对话消息"></div>
+
+        <div class="typing-row hidden" id="typingRow" aria-live="polite">
+          <div class="ai-avatar small-avatar" aria-hidden="true">江</div>
+          <div class="typing-bubble">
+            <span></span><span></span><span></span>
+            <span class="typing-label">正在整理思路</span>
+          </div>
+        </div>
+
+        <div class="chat-bottom-anchor" id="chatBottomAnchor"></div>
+      </section>
+
+      <footer class="composer-area">
+        <div class="composer-shell">
+          <label class="visually-hidden" for="messageInput">输入你的问题</label>
+          <textarea
+            id="messageInput"
+            rows="1"
+            maxlength="4000"
+            placeholder="向江南 AI 提问，开启一段新的探索……"
+            aria-label="输入你的问题"
+          ></textarea>
+
+          <div class="composer-toolbar">
+            <div class="composer-hint">
+              <span class="hint-icon" aria-hidden="true">↵</span>
+              <span>Enter 发送 · Shift + Enter 换行</span>
+            </div>
+            <div class="composer-actions">
+              <span class="character-count" id="characterCount">0 / 4000</span>
+              <button class="send-button" id="sendButton" type="button"
+                aria-label="发送消息" title="发送消息">
+                <span aria-hidden="true">↑</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <p class="disclaimer">
+          江南 AI 当前使用模拟回复，回答仅用于界面体验，尚未连接真实 AI 模型。
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
