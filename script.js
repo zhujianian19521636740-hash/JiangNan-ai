@@ -582,72 +582,99 @@ function addMessage(session, role, content) {
 }
 
 function sendMessage() {
-  if (isGeneratingReply) {
-    showToast("请等待当前模拟回复完成。");
-    return;
-  }
+async function sendMessage() {
+  if (isGeneratingReply) return;
 
   const content = elements.messageInput.value.trim();
 
-  if (!content) {
-    showToast("请先输入你的问题。");
-    elements.messageInput.focus();
-    return;
-  }
+  if (!content) return;
 
   if (content.length > MAX_MESSAGE_LENGTH) {
-    showToast("单条消息最多 4000 个字符。");
+    showToast("消息太长了，请缩短后再发送");
     return;
   }
 
-  let session = getActiveSession();
+  const session = getActiveSession();
 
   if (!session) {
-    if (sessions.length >= MAX_SESSIONS) {
-      showToast("本地会话已达上限，请先删除部分旧记录。");
-      return;
-    }
-
-    session = createSession();
-    sessions.unshift(session);
-    activeSessionId = session.id;
+    showToast("请先新建一个聊天");
+    return;
   }
 
+  // 保存用户消息
   addMessage(session, "user", content);
   updateSessionTitle(session, content);
 
+  // 清空输入框
   elements.messageInput.value = "";
   resizeInput();
   updateCharacterCount();
 
+  // 开始请求 AI
   isGeneratingReply = true;
   elements.sendButton.disabled = true;
-
-  saveSessions();
   renderAll();
 
-  replyTimer = window.setTimeout(() => {
-    /*
-     * 如果用户在等待期间切换会话，
-     * 不要把旧问题的回复写进错误的会话。
-     */
-    const currentSession = sessions.find(
-      item => item.id === session.id
+  // 记住本次聊天，防止切换会话后回复跑错位置
+  const sessionId = session.id;
+
+  try {
+    const response = await fetch(
+      "https://jiangnan-ai-api.zhujianian19521636740.workers.dev/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: session.messages
+            .filter(message =>
+              message.role === "user" ||
+              message.role === "assistant" ||
+              message.role === "system"
+            )
+            .slice(-20)
+            .map(message => ({
+              role: message.role,
+              content: message.content
+            }))
+        })
+      }
     );
 
-    if (currentSession) {
-      const reply = generateMockReply(content);
+    const data = await response.json();
 
-      addMessage(currentSession, "assistant", reply);
-      saveSessions();
+    if (!response.ok) {
+      throw new Error(data.error || "AI 请求失败");
     }
 
-    replyTimer = null;
+    if (!data.reply) {
+      throw new Error("AI 暂时没有返回内容");
+    }
+
+    // 将回答保存到原来的会话中
+    const targetSession = sessions.find(
+      item => item.id === sessionId
+    );
+
+    if (targetSession) {
+      addMessage(targetSession, "assistant", data.reply);
+      saveSessions();
+      renderAll();
+    }
+  } catch (error) {
+    console.error("江南 AI 请求失败：", error);
+    showToast(
+      "AI 回复失败：" +
+      (error.message || "请检查网络后重试").slice(0, 100)
+    );
+  } finally {
     isGeneratingReply = false;
     elements.sendButton.disabled = false;
-
     renderAll();
-  }, 700);
+  }
+}
+
 }
 
 /* 手机端侧边栏 */
