@@ -582,6 +582,8 @@ function addMessage(session, role, content) {
 }
 
 function sendMessage() {
+/* 发送消息 */
+
 async function sendMessage() {
   if (isGeneratingReply) return;
 
@@ -600,6 +602,83 @@ async function sendMessage() {
     showToast("请先新建一个聊天");
     return;
   }
+
+  // 保存用户消息
+  addMessage(session, "user", content);
+  updateSessionTitle(session, content);
+
+  // 清空输入框
+  elements.messageInput.value = "";
+  resizeInput();
+  updateCharacterCount();
+
+  // 开始请求 AI
+  isGeneratingReply = true;
+  elements.sendButton.disabled = true;
+  renderAll();
+
+  const sessionId = session.id;
+
+  try {
+    const response = await fetch(
+      "https://jiangnan-ai-api.zhujianian19521636740.workers.dev/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: session.messages
+            .filter(message =>
+              message.role === "user" ||
+              message.role === "assistant" ||
+              message.role === "system"
+            )
+            .slice(-20)
+            .map(message => ({
+              role: message.role,
+              content: message.content
+            }))
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "AI 请求失败");
+    }
+
+    if (!data.reply) {
+      throw new Error("AI 暂时没有返回内容");
+    }
+
+    // 将 AI 回答保存到原来的会话
+    const targetSession = sessions.find(
+      item => item.id === sessionId
+    );
+
+    if (targetSession) {
+      addMessage(targetSession, "assistant", data.reply);
+      saveSessions();
+      renderAll();
+    }
+
+  } catch (error) {
+    console.error("江南 AI 请求失败：", error);
+
+    showToast(
+      "AI 回复失败：" +
+      (error.message || "请检查网络后重试").slice(0, 100)
+    );
+
+  } finally {
+    isGeneratingReply = false;
+    elements.sendButton.disabled = false;
+    renderAll();
+  }
+}
+}
 
   // 保存用户消息
   addMessage(session, "user", content);
