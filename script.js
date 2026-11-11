@@ -581,7 +581,7 @@ function addMessage(session, role, content) {
   return message;
 }
 
-function sendMessage() {
+
 /* 发送消息 */
 
 async function sendMessage() {
@@ -663,6 +663,22 @@ async function sendMessage() {
       saveSessions();
       renderAll();
     }
+
+  } catch (error) {
+    console.error("江南 AI 请求失败：", error);
+
+    showToast(
+      "AI 回复失败：" +
+      (error.message || "请检查网络后重试").slice(0, 100)
+    );
+
+  } finally {
+    isGeneratingReply = false;
+    elements.sendButton.disabled = false;
+    renderAll();
+  }
+}
+
 
   } catch (error) {
     console.error("江南 AI 请求失败：", error);
