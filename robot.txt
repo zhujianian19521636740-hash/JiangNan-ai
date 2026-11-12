@@ -1,0 +1,5 @@
+
+User-agent: *
+Allow: /
+
+Sitemap: https://zhujianian19521636740-hash.github.io/JiangNan-ai/sitemap.xml
