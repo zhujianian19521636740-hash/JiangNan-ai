@@ -883,3 +883,50 @@ loadSessions();
 renderAll();
 resizeInput();
 updateCharacterCount();
+
+/* ===== 江南 AI 主题切换 ===== */
+(() => {
+  const themeButton = document.getElementById("themeToggleButton");
+
+  if (!themeButton) {
+    console.warn("没有找到主题切换按钮，请检查 HTML 中的按钮 ID。");
+    return;
+  }
+
+  const themeKey = "jiangnan_ai_theme_v1";
+
+  let savedTheme = "dark";
+
+  try {
+    const storedTheme = localStorage.getItem(themeKey);
+
+    if (storedTheme === "light" || storedTheme === "dark") {
+      savedTheme = storedTheme;
+    }
+  } catch (error) {
+    console.warn("无法读取主题设置：", error);
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+
+    themeButton.title =
+      theme === "dark" ? "切换到白紫主题" : "切换到黑紫主题";
+
+    themeButton.setAttribute("aria-label", themeButton.title);
+
+    try {
+      localStorage.setItem(themeKey, theme);
+    } catch (error) {
+      console.warn("无法保存主题设置：", error);
+    }
+  }
+
+  applyTheme(savedTheme);
+
+  themeButton.addEventListener("click", () => {
+    const currentTheme = document.documentElement.dataset.theme;
+
+    applyTheme(currentTheme === "dark" ? "light" : "dark");
+  });
+})();
