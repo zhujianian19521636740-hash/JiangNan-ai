@@ -1574,3 +1574,121 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ===== 江南 AI 页面布局统一修复 ===== */
+
+/* 主聊天区域 */
+.main-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* 聊天内容滚动区域 */
+.chat-area {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px;
+  box-sizing: border-box;
+}
+
+/* 欢迎页面整体居中 */
+#welcomeScreen {
+  width: 100%;
+  max-width: 760px;
+  min-height: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* 欢迎标题 */
+#welcomeScreen h1,
+#welcomeScreen h2 {
+  width: 100%;
+  text-align: center;
+  line-height: 1.5;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 欢迎副标题 */
+#welcomeScreen .welcome-description {
+  width: 100%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 快捷提问区域 */
+#suggestionGrid {
+  width: 100%;
+  max-width: 590px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* 聊天消息区域 */
+#messageList,
+#typingRow {
+  width: 100%;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* 底部输入区域 */
+.composer-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
+}
+
+/* 输入框 */
+.composer-shell {
+  width: 100%;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* 底部提示文字 */
+.disclaimer {
+  width: 100%;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* 手机端适配 */
+@media (max-width: 680px) {
+  .chat-area {
+    padding: 20px 14px;
+  }
+
+  .composer-area {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  #welcomeScreen {
+    padding: 25px 0;
+  }
+}
