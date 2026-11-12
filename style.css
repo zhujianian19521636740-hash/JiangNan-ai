@@ -1692,3 +1692,50 @@ input:focus-visible {
     padding: 25px 0;
   }
 }
+
+/* ===== 江南 AI 两处排版微调 ===== */
+
+/* 左侧品牌区域 */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+}
+
+.brand-copy > * {
+  text-align: left;
+}
+
+/* 底部输入框整体居中 */
+.composer-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.composer-shell {
+  width: 100%;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+.disclaimer {
+  width: 100%;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  box-sizing: border-box;
+}
