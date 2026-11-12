@@ -1701,13 +1701,20 @@ input:focus-visible {
   align-items: center;
   gap: 12px;
 }
-
 .brand-copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   min-width: 0;
+  flex: 1;
+  gap: 3px;
+  text-align: left;
+}
+
+.brand-copy > * {
+  margin-left: 0;
+  text-align: left;
 }
 
 .brand-copy > * {
@@ -1717,9 +1724,27 @@ input:focus-visible {
 /* 底部输入框整体居中 */
 .composer-area {
   width: 100%;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 12px 24px 18px;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.composer-shell {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.composer-area .disclaimer {
+  width: 100%;
+  max-width: 850px;
+  margin: 10px auto 0;
+  text-align: center;
   box-sizing: border-box;
 }
 
