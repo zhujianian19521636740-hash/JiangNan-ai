@@ -309,11 +309,151 @@ function createMessageElement(message) {
   const bubble = document.createElement("div");
   bubble.className = "message-bubble";
 
-  /*
-   * 使用 textContent 而不是 innerHTML，
-   * 避免把用户输入当作 HTML 执行。
-   */
-  bubble.textContent = message.content;
+  // 安全处理 Markdown 行内格式
+  function appendInline(parent, text) {
+    const pattern = /(\*\*[\s\S]+?\*\*|`[^`]+`)/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = pattern.exec(text)) !== null) {
+      parent.appendChild(
+        document.createTextNode(text.slice(lastIndex, match.index))
+      );
+
+      const token = match[0];
+
+      if (token.startsWith("**")) {
+        const strong = document.createElement("strong");
+        strong.textContent = token.slice(2, -2);
+        parent.appendChild(strong);
+      } else {
+        const code = document.createElement("code");
+        code.textContent = token.slice(1, -1);
+        parent.appendChild(code);
+      }
+
+      lastIndex = pattern.lastIndex;
+    }
+
+    parent.appendChild(
+      document.createTextNode(text.slice(lastIndex))
+    );
+  }
+
+  // 用户消息保持普通文本，AI 消息支持 Markdown
+  if (isUser) {
+    bubble.textContent = message.content;
+  } else {
+    const lines = String(message.content || "")
+      .replace(/\r\n/g, "\n")
+      .split("\n");
+
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+
+      // 跳过空行
+      if (!line) {
+        i++;
+        continue;
+      }
+
+      // 代码块
+      if (line.startsWith("```")) {
+        i++;
+        const codeLines = [];
+
+        while (i < lines.length && !lines[i].trim().startsWith("```")) {
+          codeLines.push(lines[i]);
+          i++;
+        }
+
+        if (i < lines.length) i++;
+
+        const pre = document.createElement("pre");
+        const code = document.createElement("code");
+        code.textContent = codeLines.join("\n");
+        pre.appendChild(code);
+        bubble.appendChild(pre);
+        continue;
+      }
+
+      // 标题
+      const heading = line.match(/^(#{1,3})\s+(.+)$/);
+
+      if (heading) {
+        const title = document.createElement(
+          heading[1].length === 1 ? "h2" : "h3"
+        );
+        appendInline(title, heading[2]);
+        bubble.appendChild(title);
+        i++;
+        continue;
+      }
+
+      // 分隔线
+      if (/^([-*_])\1{2,}$/.test(line)) {
+        bubble.appendChild(document.createElement("hr"));
+        i++;
+        continue;
+      }
+
+      // 无序列表
+      if (/^[-*+]\s+/.test(line)) {
+        const list = document.createElement("ul");
+
+        while (i < lines.length && /^[-*+]\s+/.test(lines[i].trim())) {
+          const li = document.createElement("li");
+          appendInline(li, lines[i].trim().replace(/^[-*+]\s+/, ""));
+          list.appendChild(li);
+          i++;
+        }
+
+        bubble.appendChild(list);
+        continue;
+      }
+
+      // 有序列表
+      if (/^\d+[.、]\s+/.test(line)) {
+        const list = document.createElement("ol");
+
+        while (i < lines.length && /^\d+[.、]\s+/.test(lines[i].trim())) {
+          const li = document.createElement("li");
+          appendInline(li, lines[i].trim().replace(/^\d+[.、]\s+/, ""));
+          list.appendChild(li);
+          i++;
+        }
+
+        bubble.appendChild(list);
+        continue;
+      }
+
+      // 普通段落
+      const paragraph = document.createElement("p");
+      const paragraphLines = [];
+
+      while (i < lines.length && lines[i].trim()) {
+        const current = lines[i].trim();
+
+        if (
+          /^(#{1,3})\s+/.test(current) ||
+          /^[-*+]\s+/.test(current) ||
+          /^\d+[.、]\s+/.test(current) ||
+          /^```/.test(current) ||
+          /^([-*_])\1{2,}$/.test(current)
+        ) {
+          break;
+        }
+
+        paragraphLines.push(current);
+        i++;
+      }
+
+      appendInline(paragraph, paragraphLines.join(" "));
+      bubble.appendChild(paragraph);
+    }
+  }
 
   const time = document.createElement("div");
   time.className = "message-time";
@@ -324,6 +464,7 @@ function createMessageElement(message) {
 
   return row;
 }
+
 
 function renderMessages() {
   const session = getActiveSession();
